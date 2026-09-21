@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Denny Gen AI Engineering - Universal Demand & Inventory Hub</title>
+    <!-- Include Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; color: #333; }
+        .header { background: #4f46e5; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .controls { display: flex; gap: 15px; align-items: center; }
+        select, button { padding: 8px 12px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
+        button { background-color: #6366f1; color: white; font-weight: bold; }
+        button:hover { background-color: #4338ca; }
+        
+        .container { padding: 20px; max-width: 1400px; margin: auto; }
+        
+        /* Metric Cards */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card h3 { margin: 0 0 10px 0; color: #6b7280; font-size: 13px; text-transform: uppercase; }
+        .card .value { font-size: 28px; font-weight: bold; color: #111827; }
+
+        /* Chart Section */
+        .chart-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        
+        /* Table Section */
+        .table-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .table-header input { padding: 8px; width: 250px; border: 1px solid #d1d5db; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+        th { background-color: #f9fafb; color: #374151; font-weight: 600; }
+        
+        .badge-buy { background-color: #fee2e2; color: #991b1b; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+        .badge-ok { background-color: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Denny Gen AI Engineering</h1>
+            <div style="font-size: 13px; opacity: 0.9;">Global Multi-Branch Enterprise Intelligence Hub</div>
+        </div>
+        <div class="controls">
+            <select id="companySelector" onchange="switchContext()">
+                <option value="company_a">Company: Denny Enterprise</option>
+                <option value="company_b">Company: Retail Partners Bhd</option>
+            </select>
+            <select id="branchSelector" onchange="switchContext()">
+                <option value="branch_jeli">Branch: Jeli HQ</option>
+                <option value="branch_kl">Branch: KL Central</option>
+            </select>
+            <button onclick="loadDashboard()">🔄 Refresh Data</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+            <div class="card">
+                <h3>Total Monitored SKUs</h3>
+                <div class="value" id="metric-skus">-</div>
+            </div>
+            <div class="card">
+                <h3>Items Requiring Purchase</h3>
+                <div class="value" id="metric-restock" style="color: #dc2626;">-</div>
+            </div>
+            <div class="card">
+                <h3>Active Lead Time</h3>
+                <div class="value">5 Days</div>
+            </div>
+            <div class="card">
+                <h3>System Status</h3>
+                <div class="value" style="color: #059669; font-size: 20px; margin-top: 5px;">AI Model Active</div>
+            </div>
+        </div>
+
+        <!-- Graph Section -->
+        <div class="chart-section">
+            <h3 style="margin-top:0; color:#374151;">Demand Baseline vs. Current Stock Levels</h3>
+            <div style="height: 300px;">
+                <canvas id="demandChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Actionable Table Section -->
+        <div class="table-section">
+            <div class="table-header">
+                <h3 style="margin:0; color:#374151;">Instant Action & Reorder Decisions</h3>
+                <input type="text" id="searchInput" placeholder="Search SKU or Item Name..." onkeyup="filterTable()">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>SKU</th>
+                        <th>Current Stock</th>
+                        <th>Projected Demand</th>
+                        <th>Instant Decision</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="5" style="text-align: center;">Loading enterprise data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let globalInventory = [];
+        let globalForecasts = {};
+        let demandChartInstance = null;
+
+        async function loadDashboard() {
+            try {
+                // Fetch live feeds from your Flask API backend
+                const [invRes, forecastRes] = await Promise.all([
+                    fetch('http://127.0.0.1:5002/api/loyverse-inventory'),
+                    fetch('http://127.0.0.1:5002/api/demand-forecast')
+                ]);
+
+                globalInventory = await invRes.json();
+                const forecastData = await forecastRes.json();
+
+                globalForecasts = {};
+                if (forecastData && forecastData.forecasts) {
+                    forecastData.forecasts.forEach(f => {
+                        globalForecasts[f.variant_id] = f.projected_demand;
+                    });
+                }
+
+                renderDashboard();
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Error connecting to Flask backend service.</td></tr>`;
+            }
+        }
+
+        function renderDashboard() {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            let restockCount = 0;
+            let chartLabels = [];
+            let chartStock = [];
+            let chartDemand = [];
+
+            globalInventory.forEach((item, index) => {
+                const projected = globalForecasts[item.id] || 0;
+                let decisionHtml = '';
+
+                if (item.stock <= projected) {
+                    const deficit = Math.round(projected - item.stock);
+                    decisionHtml = `<span class="badge-buy">🛒 BUY / RESTOCK (~${deficit})</span>`;
+                    restockCount++;
+                } else {
+                    decisionHtml = `<span class="badge-ok">✔ Sufficient</span>`;
+                }
+
+                // Populate Table
+                const row = `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.sku}</td>
+                    <td>${item.stock}</td>
+                    <td>${projected}</td>
+                    <td>${decisionHtml}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+
+                // Grab first 10 items for the chart to keep it clean
+                if (index < 10) {
+                    chartLabels.push(item.name);
+                    chartStock.push(item.stock);
+                    chartDemand.push(projected);
+                }
+            });
+
+            // Update Metrics Cards
+            document.getElementById('metric-skus').innerText = globalInventory.length;
+            document.getElementById('metric-restock').innerText = restockCount;
+
+            // Render Chart
+            renderChart(chartLabels, chartStock, chartDemand);
+        }
+
+        function renderChart(labels, stockData, demandData) {
+            const ctx = document.getElementById('demandChart').getContext('2d');
+            if (demandChartInstance) {
+                demandChartInstance.destroy();
+            }
+
+            demandChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Current Stock',
+                            data: stockData,
+                            backgroundColor: '#6366f1'
+                        },
+                        {
+                            label: 'Projected Demand',
+                            data: demandData,
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.getElementById('table-body').getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const text = rows[i].innerText.toLowerCase();
+                rows[i].style.display = text.includes(input) ? '' : 'none';
+            }
+        }
+
+        function switchContext() {
+            // Placeholder function to handle switching companies/branches dynamically
+            loadDashboard();
+        }
+
+        // Initialize on load
+        loadDashboard();
+    </script>
+</body>
+</html>
