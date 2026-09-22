@@ -65,6 +65,7 @@ def load_item_catalog():
 def get_loyverse_inventory():
     print("\n--- Starting Inventory Fetch ---")
     load_item_catalog()
+    print(f"Current CACHED_VARIANT_MAP size: {len(CACHED_VARIANT_MAP)}")
 
     try:
         print("Fetching live inventory levels...")
@@ -76,7 +77,8 @@ def get_loyverse_inventory():
                 v_id = inv.get("variant_id") or inv.get("id")
                 stock = inv.get("in_stock", 0)
                 
-                print(f"Looking up Inventory Variant ID: {v_id}")
+                found = v_id in CACHED_VARIANT_MAP
+                print(f"Looking up Variant ID: {v_id} | Found in Cache: {found}")
                 
                 info = CACHED_VARIANT_MAP.get(v_id, {"item_name": "Unknown", "sku": "N/A"})
                 live_inventory.append({
