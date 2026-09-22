@@ -139,6 +139,9 @@ def get_demand_forecast():
 def serve_dashboard():
     return send_from_directory('.', 'index.html')
 
+print("Pre-loading item catalog on startup...")
+load_item_catalog()
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
