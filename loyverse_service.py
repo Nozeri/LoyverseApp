@@ -25,7 +25,9 @@ def load_item_catalog():
     page = 1
     
     while url:
-
+	if page > 10:  # Safe limit to prevent 502 timeouts
+        print("Reached safe page limit.")
+        break
         
         try:
             print(f"Fetching items page {page}...")
