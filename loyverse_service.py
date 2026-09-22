@@ -25,10 +25,10 @@ def load_item_catalog():
     page = 1
     
     while url:
-	if page > 10:  # Safe limit to prevent 502 timeouts
-        print("Reached safe page limit.")
-        break
-        
+        if page > 10:  # Safe limit to prevent 502 timeouts
+            print("Reached safe page limit.")
+            break
+            
         try:
             print(f"Fetching items page {page}...")
             res = requests.get(url, headers=HEADERS, timeout=10)
@@ -52,7 +52,7 @@ def load_item_catalog():
         except requests.exceptions.Timeout:
             print("Items page fetch timed out.")
             break
-            
+        
     CACHED_VARIANT_MAP = variant_map
     CATALOG_LOADED = True
     print(f"Catalog loaded successfully. Total mapped variants: {len(CACHED_VARIANT_MAP)}")
