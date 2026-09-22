@@ -32,9 +32,11 @@ def load_item_catalog():
         try:
             print(f"Fetching items page {page}...")
             res = requests.get(url, headers=HEADERS, timeout=10)
+            print(f"Items API Status Code: {res.status_code}")
             if res.status_code == 200:
                 data = res.json()
                 items = data.get("items", [])
+                print(f"Found {len(items)} items on page {page}")
                 for item in items:
                     item_name = item.get("item_name") or item.get("name", "Unknown")
                     for variant in item.get("variants", []):
@@ -49,6 +51,7 @@ def load_item_catalog():
                 url = f"{BASE_URL}/items?cursor={cursor}" if cursor else None
                 page += 1
             else:
+                print(f"Failed to fetch items: {res.text}")
                 break
         except requests.exceptions.Timeout:
             print("Items page fetch timed out.")
