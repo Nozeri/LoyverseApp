@@ -118,8 +118,8 @@
             try {
                 // Fetch live feeds from your Flask API backend
                 const [invRes, forecastRes] = await Promise.all([
-                    fetch('http://127.0.0.1:5002/api/loyverse-inventory'),
-                    fetch('http://127.0.0.1:5002/api/demand-forecast')
+                    	fetch('/api/loyverse-inventory'),
+			fetch('/api/demand-forecast')
                 ]);
 
                 globalInventory = await invRes.json();
