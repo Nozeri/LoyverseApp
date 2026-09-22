@@ -25,8 +25,8 @@ def load_item_catalog():
     page = 1
     
     while url:
-        if page > 50:  # Increased page limit to cover the entire catalog
-            print("Reached safe page limit (50).")
+        if page > 100:  # Increased limit to 100 pages for large catalogs
+            print("Reached maximum page limit (100).")
             break
             
         try:
@@ -58,7 +58,7 @@ def load_item_catalog():
         
     CACHED_VARIANT_MAP = variant_map
     CATALOG_LOADED = True
-    print(f"Catalog loaded successfully. Total mapped variants: {len(CACHED_VARIANT_MAP)}")
+    print(f"Catalog loaded successfully. Total pages fetched: {page - 1}, Total mapped variants: {len(CACHED_VARIANT_MAP)}")
 
 @app.route('/api/loyverse-inventory', methods=['GET'])
 def get_loyverse_inventory():
