@@ -1,6 +1,4 @@
 import os
-
-
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import requests
@@ -27,12 +25,12 @@ def load_item_catalog():
     page = 1
     
     while url:
-    	# Temporary safeguard to prevent 502 timeouts
-    	if page > 3:
+        # Temporary safeguard to prevent 502 timeouts
+        if page > 3:
             print("Reached page limit for quick load.")
             break
         
-    	try:
+        try:
             print(f"Fetching items page {page}...")
             res = requests.get(url, headers=HEADERS, timeout=10)
             if res.status_code == 200:
@@ -135,8 +133,6 @@ def get_demand_forecast():
 def serve_dashboard():
     return send_from_directory('.', 'index.html')
 
-
-####
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5002))
     app.run(host="0.0.0.0", port=port)
