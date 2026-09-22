@@ -1,8 +1,5 @@
 import os
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5002))
-    app.run(host="0.0.0.0", port=port)
 
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
@@ -133,5 +130,8 @@ def get_demand_forecast():
 def serve_dashboard():
     return send_from_directory('.', 'index.html')
 
-if __name__ == '__main__':
-    app.run(port=5002, debug=True)
+
+####
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5002))
+    app.run(host="0.0.0.0", port=port)
