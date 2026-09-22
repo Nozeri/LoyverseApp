@@ -25,10 +25,6 @@ def load_item_catalog():
     page = 1
     
     while url:
-        if page > 100:  # Increased limit to 100 pages for large catalogs
-            print("Reached maximum page limit (100).")
-            break
-            
         try:
             print(f"Fetching items page {page}...")
             res = requests.get(url, headers=HEADERS, timeout=15)
