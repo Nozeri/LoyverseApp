@@ -44,6 +44,7 @@ def load_item_catalog():
                                 "item_name": item_name,
                                 "sku": variant.get("sku", "N/A")
                             }
+                            print(f"Mapped Variant ID: {v_id} -> {item_name}")
                 cursor = data.get("cursor")
                 url = f"{BASE_URL}/items?cursor={cursor}" if cursor else None
                 page += 1
@@ -71,6 +72,9 @@ def get_loyverse_inventory():
             for inv in inv_data:
                 v_id = inv.get("variant_id") or inv.get("id")
                 stock = inv.get("in_stock", 0)
+                
+                print(f"Looking up Inventory Variant ID: {v_id}")
+                
                 info = CACHED_VARIANT_MAP.get(v_id, {"item_name": "Unknown", "sku": "N/A"})
                 live_inventory.append({
                     "id": v_id,
