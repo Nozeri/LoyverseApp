@@ -25,13 +25,13 @@ def load_item_catalog():
     page = 1
     
     while url:
-        if page > 10:  # Safe limit to prevent 502 timeouts
-            print("Reached safe page limit.")
+        if page > 50:  # Increased page limit to cover the entire catalog
+            print("Reached safe page limit (50).")
             break
             
         try:
             print(f"Fetching items page {page}...")
-            res = requests.get(url, headers=HEADERS, timeout=10)
+            res = requests.get(url, headers=HEADERS, timeout=15)
             print(f"Items API Status Code: {res.status_code}")
             if res.status_code == 200:
                 data = res.json()
@@ -46,7 +46,6 @@ def load_item_catalog():
                                 "item_name": item_name,
                                 "sku": variant.get("sku", "N/A")
                             }
-                            print(f"Mapped Variant ID: {v_id} -> {item_name}")
                 cursor = data.get("cursor")
                 url = f"{BASE_URL}/items?cursor={cursor}" if cursor else None
                 page += 1
@@ -69,7 +68,7 @@ def get_loyverse_inventory():
 
     try:
         print("Fetching live inventory levels...")
-        inv_res = requests.get(f"{BASE_URL}/inventory", headers=HEADERS, timeout=10)
+        inv_res = requests.get(f"{BASE_URL}/inventory", headers=HEADERS, timeout=15)
         if inv_res.status_code == 200:
             inv_data = inv_res.json().get("inventory_levels", [])
             live_inventory = []
@@ -78,7 +77,8 @@ def get_loyverse_inventory():
                 stock = inv.get("in_stock", 0)
                 
                 found = v_id in CACHED_VARIANT_MAP
-                print(f"Looking up Variant ID: {v_id} | Found in Cache: {found}")
+                if not found:
+                    print(f"Missing Variant ID in Cache: {v_id}")
                 
                 info = CACHED_VARIANT_MAP.get(v_id, {"item_name": "Unknown", "sku": "N/A"})
                 live_inventory.append({
@@ -106,7 +106,7 @@ def get_demand_forecast():
     while url and page_count < max_pages:
         try:
             print(f"Fetching receipts page {page_count + 1}...")
-            res = requests.get(url, headers=HEADERS, timeout=10)
+            res = requests.get(url, headers=HEADERS, timeout=15)
             if res.status_code != 200:
                 break
             data = res.json()
