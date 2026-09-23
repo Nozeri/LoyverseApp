@@ -62,7 +62,7 @@
                 <option value="branch_jeli">BRANCH SHOP: Jeli HQ</option>
                 <option value="branch_kl">BRANCH SHOP: KL Central</option>
             </select>
-            <button id="refreshBtn" onclick="loadDashboard()">🔄 Refresh Data</button>
+            <button id="refreshBtn" onclick="loadDashboard(false)">🔄 Refresh Data</button>
         </div>
     </div>
 
@@ -146,9 +146,9 @@
         let globalForecasts = {};
         let demandChartInstance = null;
 
-        async function loadDashboard() {
+        async function loadDashboard(silent = false) {
             const btn = document.getElementById('refreshBtn');
-            if (btn) {
+            if (btn && !silent) {
                 btn.disabled = true;
                 btn.innerText = '⏳ Refreshing...';
             }
@@ -173,9 +173,11 @@
                 await loadPlatformRevenue();
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Error connecting to Flask backend service.</td></tr>`;
+                if (!silent) {
+                    document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Error connecting to Flask backend service.</td></tr>`;
+                }
             } finally {
-                if (btn) {
+                if (btn && !silent) {
                     btn.disabled = false;
                     btn.innerText = '🔄 Refresh Data';
                 }
@@ -289,7 +291,7 @@
         }
 
         function switchContext() {
-            loadDashboard();
+            loadDashboard(false);
         }
 
         async function saveConfiguration(event) {
@@ -314,7 +316,7 @@
                         branchSelector.options[branchSelector.selectedIndex].text = `BRANCH SHOP: ${branchDisplayName}`;
                     }
 
-                    loadDashboard();
+                    loadDashboard(false);
                 } else {
                     alert(result.error || "Failed to save configuration.");
                 }
@@ -324,7 +326,13 @@
             }
         }
 
-        loadDashboard();
+        // Initial load on page open
+        loadDashboard(false);
+
+        // Automatically poll/refresh data in the background every 10 seconds silently
+        setInterval(() => {
+            loadDashboard(true);
+        }, 10000);
     </script>
 </body>
 </html>
