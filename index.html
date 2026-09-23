@@ -25,7 +25,7 @@
         .config-field input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
 
         /* Metric Cards */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .card h3 { margin: 0 0 10px 0; color: #6b7280; font-size: 13px; text-transform: uppercase; }
         .card .value { font-size: 28px; font-weight: bold; color: #111827; }
@@ -58,8 +58,8 @@
                 <option value="company_b">Company: Retail Partners Bhd</option>
             </select>
             <select id="branchSelector" onchange="switchContext()">
-                <option value="branch_jeli">Branch: Jeli HQ</option>
-                <option value="branch_kl">Branch: KL Central</option>
+                <option value="branch_jeli">BRANCH SHOP: Jeli HQ</option>
+                <option value="branch_kl">BRANCH SHOP: KL Central</option>
             </select>
             <button onclick="loadDashboard()">🔄 Refresh Data</button>
         </div>
@@ -100,8 +100,8 @@
                 <div class="value" id="metric-restock" style="color: #dc2626;">-</div>
             </div>
             <div class="card">
-                <h3>Active Lead Time</h3>
-                <div class="value">5 Days</div>
+                <h3>Platform Earnings (1%)</h3>
+                <div class="value" id="metric-earnings" style="color: #059669;">RM 0.00</div>
             </div>
             <div class="card">
                 <h3>System Status</h3>
@@ -163,9 +163,23 @@
                 }
 
                 renderDashboard();
+                loadPlatformRevenue();
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
                 document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Error connecting to Flask backend service.</td></tr>`;
+            }
+        }
+
+        async function loadPlatformRevenue() {
+            try {
+                const response = await fetch('/api/platform-revenue');
+                const data = await response.json();
+                
+                if (data && data.platform_fee_earned !== undefined) {
+                    document.getElementById('metric-earnings').innerText = `RM ${data.platform_fee_earned.toFixed(2)}`;
+                }
+            } catch (err) {
+                console.error("Failed to calculate platform revenue:", err);
             }
         }
 
@@ -264,7 +278,6 @@
             const apiToken = document.getElementById('api-token').value;
             const hostingEnv = document.getElementById('hosting-env').value;
 
-            // Extract a clean branch name from the URL to display as BRANCH SHOP
             let branchDisplayName = hostingEnv.replace(/^https?:\/\//, '').split('/')[0];
 
             try {
@@ -277,7 +290,6 @@
                 if (response.ok) {
                     alert(result.message || "Configuration saved successfully!");
                     
-                    // Dynamically update the branch selector to display "BRANCH SHOP: [Name]" at the top
                     const branchSelector = document.getElementById('branchSelector');
                     if (branchSelector) {
                         branchSelector.options[branchSelector.selectedIndex].text = `BRANCH SHOP: ${branchDisplayName}`;
