@@ -9,6 +9,7 @@
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; color: #333; }
         .header { background: #4f46e5; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; font-size: 24px; }
+        .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.3px; }
         .controls { display: flex; gap: 15px; align-items: center; }
         select, button { padding: 8px 12px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
         button { background-color: #6366f1; color: white; font-weight: bold; }
@@ -49,7 +50,7 @@
     <div class="header">
         <div>
             <h1>Denny Gen AI Engineering</h1>
-            <div style="font-size: 13px; opacity: 0.9;">Global Multi-Branch Enterprise Intelligence Hub</div>
+            <div class="subtitle">Global Multi-Branch Enterprise Intelligence Hub</div>
         </div>
         <div class="controls">
             <select id="companySelector" onchange="switchContext()">
@@ -72,8 +73,8 @@
             <form id="config-form" onsubmit="saveConfiguration(event)">
                 <div class="config-grid">
                     <div class="config-field">
-                        <label>1. Loyverse API Access Token:</label>
-                        <input type="password" id="api-token" placeholder="Enter your token here" required>
+                        <label>1. POS API Access Token:</label>
+                        <input type="password" id="api-token" placeholder="Enter your POS token here" required>
                     </div>
                     <div class="config-field">
                         <label>2. Hosting Environment / Branch URL:</label>
@@ -146,7 +147,6 @@
 
         async function loadDashboard() {
             try {
-                // Fetch live feeds from your Flask API backend
                 const [invRes, forecastRes] = await Promise.all([
                     fetch('/api/loyverse-inventory'),
                     fetch('/api/demand-forecast')
@@ -190,7 +190,6 @@
                     decisionHtml = `<span class="badge-ok">✔ Sufficient</span>`;
                 }
 
-                // Populate Table
                 const row = `<tr>
                     <td>${item.name}</td>
                     <td>${item.sku}</td>
@@ -200,7 +199,6 @@
                 </tr>`;
                 tableBody.innerHTML += row;
 
-                // Grab first 10 items for the chart to keep it clean
                 if (index < 10) {
                     chartLabels.push(item.name);
                     chartStock.push(item.stock);
@@ -208,11 +206,9 @@
                 }
             });
 
-            // Update Metrics Cards
             document.getElementById('metric-skus').innerText = globalInventory.length;
             document.getElementById('metric-restock').innerText = restockCount;
 
-            // Render Chart
             renderChart(chartLabels, chartStock, chartDemand);
         }
 
@@ -260,7 +256,6 @@
         }
 
         function switchContext() {
-            // Placeholder function to handle switching companies/branches dynamically
             loadDashboard();
         }
 
@@ -288,7 +283,6 @@
             }
         }
 
-        // Initialize on load
         loadDashboard();
     </script>
 </body>
