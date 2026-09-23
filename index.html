@@ -100,12 +100,12 @@
                 <div class="value" id="metric-restock" style="color: #dc2626;">-</div>
             </div>
             <div class="card">
-                <h3>Platform Earnings (1%)</h3>
-                <div class="value" id="metric-earnings" style="color: #059669;">RM 0.00</div>
+                <h3>Branch Sales Volume</h3>
+                <div class="value" id="metric-sales" style="color: #2563eb;">RM 0.00</div>
             </div>
             <div class="card">
-                <h3>System Status</h3>
-                <div class="value" style="color: #059669; font-size: 20px; margin-top: 5px;">AI Model Active</div>
+                <h3>Platform Commission (1%)</h3>
+                <div class="value" id="metric-earnings" style="color: #059669;">RM 0.00</div>
             </div>
         </div>
 
@@ -175,8 +175,13 @@
                 const response = await fetch('/api/platform-revenue');
                 const data = await response.json();
                 
-                if (data && data.platform_fee_earned !== undefined) {
-                    document.getElementById('metric-earnings').innerText = `RM ${data.platform_fee_earned.toFixed(2)}`;
+                if (data) {
+                    if (data.total_sales !== undefined) {
+                        document.getElementById('metric-sales').innerText = `RM ${data.total_sales.toFixed(2)}`;
+                    }
+                    if (data.platform_fee_earned !== undefined) {
+                        document.getElementById('metric-earnings').innerText = `RM ${data.platform_fee_earned.toFixed(2)}`;
+                    }
                 }
             } catch (err) {
                 console.error("Failed to calculate platform revenue:", err);
