@@ -14,6 +14,7 @@
         select, button { padding: 8px 12px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
         button { background-color: #6366f1; color: white; font-weight: bold; }
         button:hover { background-color: #4338ca; }
+        button:disabled { background-color: #9ca3af; cursor: not-allowed; }
         
         .container { padding: 20px; max-width: 1400px; margin: auto; }
         
@@ -61,7 +62,7 @@
                 <option value="branch_jeli">BRANCH SHOP: Jeli HQ</option>
                 <option value="branch_kl">BRANCH SHOP: KL Central</option>
             </select>
-            <button onclick="loadDashboard()">🔄 Refresh Data</button>
+            <button id="refreshBtn" onclick="loadDashboard()">🔄 Refresh Data</button>
         </div>
     </div>
 
@@ -146,6 +147,12 @@
         let demandChartInstance = null;
 
         async function loadDashboard() {
+            const btn = document.getElementById('refreshBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = '⏳ Refreshing...';
+            }
+
             try {
                 const [invRes, forecastRes] = await Promise.all([
                     fetch('/api/loyverse-inventory'),
@@ -163,10 +170,15 @@
                 }
 
                 renderDashboard();
-                loadPlatformRevenue();
+                await loadPlatformRevenue();
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
                 document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Error connecting to Flask backend service.</td></tr>`;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = '🔄 Refresh Data';
+                }
             }
         }
 
@@ -176,7 +188,9 @@
                 const data = await response.json();
                 
                 if (data) {
-                    if (data.total_sales !== undefined) {
+                    if (data.total_sales_gmv !== undefined) {
+                        document.getElementById('metric-sales').innerText = `RM ${data.total_sales_gmv.toFixed(2)}`;
+                    } else if (data.total_sales !== undefined) {
                         document.getElementById('metric-sales').innerText = `RM ${data.total_sales.toFixed(2)}`;
                     }
                     if (data.platform_fee_earned !== undefined) {
