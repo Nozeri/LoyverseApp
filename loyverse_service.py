@@ -133,6 +133,32 @@ def get_demand_forecast():
         "forecasts": forecast_results
     })
 
+@app.route('/api/save-config', methods=['POST'])
+def save_client_config():
+    global API_TOKEN, HEADERS, CATALOG_LOADED, CACHED_VARIANT_MAP
+    data = request.json or {}
+    api_token = data.get('api_token')
+    
+    if not api_token:
+        return jsonify({"error": "API Token is required"}), 400
+        
+    # Update runtime credentials
+    API_TOKEN = api_token.strip()
+    HEADERS = {"Authorization": f"Bearer {API_TOKEN}", "Content-Type": "application/json"}
+    
+    # Reset cache to force reload with the new token
+    CATALOG_LOADED = False
+    CACHED_VARIANT_MAP = {}
+    
+    try:
+        load_item_catalog()
+        return jsonify({
+            "status": "success",
+            "message": "Configuration saved & catalog re-loaded successfully!"
+        })
+    except Exception as e:
+        return jsonify({"error": f"Failed to connect using provided token: {str(e)}"}), 500
+
 @app.route('/')
 def serve_dashboard():
     return send_from_directory('.', 'index.html')

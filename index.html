@@ -16,6 +16,13 @@
         
         .container { padding: 20px; max-width: 1400px; margin: auto; }
         
+        /* Onboarding Configuration Box */
+        .config-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .config-card h3 { margin-top: 0; color: #374151; font-size: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .config-field label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 5px; }
+        .config-field input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+
         /* Metric Cards */
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -58,6 +65,29 @@
     </div>
 
     <div class="container">
+        
+        <!-- Client Onboarding Configuration Box -->
+        <div class="config-card">
+            <h3>System Access & Setup Configuration</h3>
+            <form id="config-form" onsubmit="saveConfiguration(event)">
+                <div class="config-grid">
+                    <div class="config-field">
+                        <label>1. Loyverse API Access Token:</label>
+                        <input type="password" id="api-token" placeholder="Enter your token here" required>
+                    </div>
+                    <div class="config-field">
+                        <label>2. Hosting Environment / Branch URL:</label>
+                        <input type="text" id="hosting-env" placeholder="e.g., https://your-app.onrender.com" required>
+                    </div>
+                    <div class="config-field">
+                        <label>3. Client Interface Browser URL:</label>
+                        <input type="text" id="dashboard-url" value="https://loyverse-dashboard.onrender.com" readonly>
+                    </div>
+                </div>
+                <button type="submit">Save & Initialize System</button>
+            </form>
+        </div>
+
         <!-- Metrics Cards -->
         <div class="metrics-grid">
             <div class="card">
@@ -118,8 +148,8 @@
             try {
                 // Fetch live feeds from your Flask API backend
                 const [invRes, forecastRes] = await Promise.all([
-                    	fetch('/api/loyverse-inventory'),
-			fetch('/api/demand-forecast')
+                    fetch('/api/loyverse-inventory'),
+                    fetch('/api/demand-forecast')
                 ]);
 
                 globalInventory = await invRes.json();
@@ -232,6 +262,30 @@
         function switchContext() {
             // Placeholder function to handle switching companies/branches dynamically
             loadDashboard();
+        }
+
+        async function saveConfiguration(event) {
+            event.preventDefault();
+            const apiToken = document.getElementById('api-token').value;
+            const hostingEnv = document.getElementById('hosting-env').value;
+
+            try {
+                const response = await fetch('/api/save-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_token: apiToken, hosting_env: hostingEnv })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message || "Configuration saved successfully!");
+                    loadDashboard();
+                } else {
+                    alert(result.error || "Failed to save configuration.");
+                }
+            } catch (err) {
+                console.error("Error saving config:", err);
+                alert("Network error while saving configuration.");
+            }
         }
 
         // Initialize on load
