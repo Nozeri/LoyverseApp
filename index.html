@@ -255,13 +255,13 @@
                 demandChartInstance.destroy();
             }
 
-            // Map each stock bar explicitly: Red (#dc2626) for restock, Blue (#3b82f6) for sufficient
+            // Explicit color arrays for Current Stock: Red for restock deficit, Blue for sufficient stock
             const stockColors = inventorySlice.map(item => {
                 const projected = globalForecasts[item.id] || 0;
                 return item.stock <= projected ? '#dc2626' : '#3b82f6';
             });
             
-            // Map demand bars explicitly to green (#10b981) matching the legend box
+            // Explicit solid green (#10b981) for all Projected Demand bars
             const demandColors = inventorySlice.map(() => '#10b981');
 
             demandChartInstance = new Chart(ctx, {
@@ -272,12 +272,16 @@
                         {
                             label: 'Current Stock',
                             data: stockData,
-                            backgroundColor: stockColors
+                            backgroundColor: stockColors,
+                            borderColor: stockColors,
+                            borderWidth: 1
                         },
                         {
                             label: 'Projected Demand',
                             data: demandData,
-                            backgroundColor: demandColors
+                            backgroundColor: demandColors,
+                            borderColor: demandColors,
+                            borderWidth: 1
                         }
                     ]
                 },
