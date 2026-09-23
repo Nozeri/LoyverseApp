@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import requests
@@ -133,6 +134,51 @@ def get_demand_forecast():
         "forecasts": forecast_results
     })
 
+@app.route('/api/platform-revenue', methods=['GET'])
+def calculate_platform_fee():
+    print("\n--- Calculating Platform Revenue from Receipts (September 2026) ---")
+    total_sales_gmv = 0.0
+    url = f"{BASE_URL}/receipts"
+    
+    page_count = 0
+    max_pages = 5
+    target_year = 2026
+    target_month = 9  # September
+    
+    while url and page_count < max_pages:
+        try:
+            res = requests.get(url, headers=HEADERS, timeout=15)
+            if res.status_code != 200:
+                break
+            data = res.json()
+            for receipt in data.get("receipts", []):
+                created_at_str = receipt.get("created_at")
+                if created_at_str:
+                    try:
+                        receipt_date = datetime.fromisoformat(created_at_str.replace("Z", "+00:00"))
+                        if receipt_date.year == target_year and receipt_date.month == target_month:
+                            total_sales_gmv += float(receipt.get("total_money", 0.0))
+                    except ValueError:
+                        pass
+            
+            cursor = data.get("cursor")
+            url = f"{BASE_URL}/receipts?cursor={cursor}" if cursor else None
+            page_count += 1
+        except requests.exceptions.Timeout:
+            break
+    
+    # Calculate 1% fee (RM 0.01 per RM 1.00)
+    platform_fee_earned = total_sales_gmv * 0.01
+    
+    return jsonify({
+        "status": "success",
+        "receipt_pages_analyzed": page_count,
+        "billing_cycle": "September 2026",
+        "total_sales_gmv": round(total_sales_gmv, 2),
+        "commission_rate": "1%",
+        "platform_fee_earned": round(platform_fee_earned, 2)
+    })
+
 @app.route('/api/save-config', methods=['POST'])
 def save_client_config():
     global API_TOKEN, HEADERS, CATALOG_LOADED, CACHED_VARIANT_MAP
@@ -142,11 +188,9 @@ def save_client_config():
     if not api_token:
         return jsonify({"error": "API Token is required"}), 400
         
-    # Update runtime credentials
     API_TOKEN = api_token.strip()
     HEADERS = {"Authorization": f"Bearer {API_TOKEN}", "Content-Type": "application/json"}
     
-    # Reset cache to force reload with the new token
     CATALOG_LOADED = False
     CACHED_VARIANT_MAP = {}
     
