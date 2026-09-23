@@ -237,8 +237,8 @@
 
                 if (index < 10) {
                     chartLabels.push(item.name);
-                    chartStock.push(item.stock);
-                    chartDemand.push(projected);
+                    chartStock.push(Number(item.stock) || 0);
+                    chartDemand.push(Number(projected) || 0);
                     chartInventorySlice.push(item);
                 }
             });
@@ -255,7 +255,7 @@
                 demandChartInstance.destroy();
             }
 
-            // Color code stock bars: Red alert if stock <= demand, Blue if sufficient
+            // Color code stock bars: Red alert (#dc2626) if stock <= demand, Blue (#3b82f6) if sufficient
             const stockColors = inventorySlice.map(item => {
                 const projected = globalForecasts[item.id] || 0;
                 return item.stock <= projected ? '#dc2626' : '#3b82f6';
