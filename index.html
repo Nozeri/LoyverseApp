@@ -264,6 +264,9 @@
             const apiToken = document.getElementById('api-token').value;
             const hostingEnv = document.getElementById('hosting-env').value;
 
+            // Extract a clean branch name from the URL to display as BRANCH SHOP
+            let branchDisplayName = hostingEnv.replace(/^https?:\/\//, '').split('/')[0];
+
             try {
                 const response = await fetch('/api/save-config', {
                     method: 'POST',
@@ -273,6 +276,13 @@
                 const result = await response.json();
                 if (response.ok) {
                     alert(result.message || "Configuration saved successfully!");
+                    
+                    // Dynamically update the branch selector to display "BRANCH SHOP: [Name]" at the top
+                    const branchSelector = document.getElementById('branchSelector');
+                    if (branchSelector) {
+                        branchSelector.options[branchSelector.selectedIndex].text = `BRANCH SHOP: ${branchDisplayName}`;
+                    }
+
                     loadDashboard();
                 } else {
                     alert(result.error || "Failed to save configuration.");
