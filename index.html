@@ -112,7 +112,7 @@
 
         <!-- Graph Section -->
         <div class="chart-section">
-            <h3 style="margin-top:0; color:#374151;">Stock vs. Demand Variance (Deficit / Surplus)</h3>
+            <h3 style="margin-top:0; color:#374151;">Demand Baseline vs. Current Stock Levels</h3>
             <div style="height: 300px;">
                 <canvas id="demandChart"></canvas>
             </div>
@@ -210,17 +210,16 @@
 
             let restockCount = 0;
             let chartLabels = [];
-            let chartDataValues = [];
+            let chartStock = [];
+            let chartDemand = [];
+            let chartInventorySlice = [];
 
             globalInventory.forEach((item, index) => {
                 const projected = globalForecasts[item.id] || 0;
                 let decisionHtml = '';
 
-                // Calculate stock variance (Stock minus Demand)
-                const variance = Number(item.stock) - Number(projected);
-
-                if (variance < 0) {
-                    const deficit = Math.abs(Math.round(variance));
+                if (item.stock <= projected) {
+                    const deficit = Math.round(projected - item.stock);
                     decisionHtml = `<span class="badge-buy">🛒 BUY / RESTOCK (~${deficit})</span>`;
                     restockCount++;
                 } else {
@@ -238,21 +237,29 @@
 
                 if (index < 10) {
                     chartLabels.push(item.name);
-                    chartDataValues.push(variance); // Negative values drop below zero, positive stay above
+                    chartStock.push(Number(item.stock) || 0);
+                    chartDemand.push(Number(projected) || 0);
+                    chartInventorySlice.push(item);
                 }
             });
 
             document.getElementById('metric-skus').innerText = globalInventory.length;
             document.getElementById('metric-restock').innerText = restockCount;
 
-            renderChart(chartLabels, chartDataValues);
+            renderChart(chartLabels, chartStock, chartDemand, chartInventorySlice);
         }
 
-        function renderChart(labels, dataValues) {
+        function renderChart(labels, stockData, demandData, inventorySlice) {
             const ctx = document.getElementById('demandChart').getContext('2d');
             if (demandChartInstance) {
                 demandChartInstance.destroy();
             }
+
+            // Current Stock colors: Red (#dc2626) if stock <= demand, Blue (#3b82f6) if sufficient
+            const stockColors = inventorySlice.map(item => {
+                const projected = globalForecasts[item.id] || 0;
+                return item.stock <= projected ? '#dc2626' : '#3b82f6';
+            });
 
             demandChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -260,13 +267,14 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Stock Variance (Deficit / Surplus)',
-                            data: dataValues,
-                            // Dynamically color negative bars Red (#ef4444) and positive bars Blue (#3b82f6)
-                            backgroundColor: function(context) {
-                                const val = context.raw;
-                                return val < 0 ? '#ef4444' : '#3b82f6';
-                            }
+                            label: 'Current Stock',
+                            data: stockData,
+                            backgroundColor: stockColors
+                        },
+                        {
+                            label: 'Projected Demand',
+                            data: demandData,
+                            backgroundColor: '#10b981' // Distinct Green for Demand
                         }
                     ]
                 },
@@ -277,12 +285,17 @@
                         y: { 
                             beginAtZero: true,
                             grid: {
-                                // Highlight zero line distinctly
                                 color: function(context) {
-                                    return context.tick.value === 0 ? '#374151' : '#e5e7eb';
+                                    if (context.tick.value === 0) {
+                                        return '#374151'; // Darker charcoal zero baseline
+                                    }
+                                    return '#e5e7eb';
                                 },
                                 lineWidth: function(context) {
-                                    return context.tick.value === 0 ? 2 : 1;
+                                    if (context.tick.value === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
                                 }
                             }
                         }
