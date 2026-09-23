@@ -212,6 +212,7 @@
             let chartLabels = [];
             let chartStock = [];
             let chartDemand = [];
+            let chartInventorySlice = [];
 
             globalInventory.forEach((item, index) => {
                 const projected = globalForecasts[item.id] || 0;
@@ -238,20 +239,27 @@
                     chartLabels.push(item.name);
                     chartStock.push(item.stock);
                     chartDemand.push(projected);
+                    chartInventorySlice.push(item);
                 }
             });
 
             document.getElementById('metric-skus').innerText = globalInventory.length;
             document.getElementById('metric-restock').innerText = restockCount;
 
-            renderChart(chartLabels, chartStock, chartDemand);
+            renderChart(chartLabels, chartStock, chartDemand, chartInventorySlice);
         }
 
-        function renderChart(labels, stockData, demandData) {
+        function renderChart(labels, stockData, demandData, inventorySlice) {
             const ctx = document.getElementById('demandChart').getContext('2d');
             if (demandChartInstance) {
                 demandChartInstance.destroy();
             }
+
+            // Color code stock bars: Red alert if stock <= demand, Blue if sufficient
+            const stockColors = inventorySlice.map(item => {
+                const projected = globalForecasts[item.id] || 0;
+                return item.stock <= projected ? '#dc2626' : '#3b82f6';
+            });
 
             demandChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -261,7 +269,7 @@
                         {
                             label: 'Current Stock',
                             data: stockData,
-                            backgroundColor: '#6366f1'
+                            backgroundColor: stockColors
                         },
                         {
                             label: 'Projected Demand',
@@ -274,7 +282,23 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { 
+                            beginAtZero: true,
+                            grid: {
+                                color: function(context) {
+                                    if (context.tick.value === 0) {
+                                        return '#374151'; // Darker charcoal for zero line
+                                    }
+                                    return '#e5e7eb';
+                                },
+                                lineWidth: function(context) {
+                                    if (context.tick.value === 0) {
+                                        return 2; // Thicker zero line
+                                    }
+                                    return 1;
+                                }
+                            }
+                        }
                     }
                 }
             });
