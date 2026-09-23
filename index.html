@@ -255,7 +255,7 @@
                 demandChartInstance.destroy();
             }
 
-            // Current Stock colors: Red (#dc2626) if stock <= demand, Blue (#3b82f6) if sufficient
+            // Current Stock colors: Red (#dc2626) for restock alerts, Blue (#3b82f6) for sufficient stock
             const stockColors = inventorySlice.map(item => {
                 const projected = globalForecasts[item.id] || 0;
                 return item.stock <= projected ? '#dc2626' : '#3b82f6';
@@ -274,20 +274,26 @@
                         {
                             label: 'Projected Demand',
                             data: demandData,
-                            backgroundColor: '#10b981' // Distinct Green for Demand
+                            backgroundColor: '#10b981' // Green matching the legend
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
                     scales: {
                         y: { 
                             beginAtZero: true,
                             grid: {
                                 color: function(context) {
                                     if (context.tick.value === 0) {
-                                        return '#374151'; // Darker charcoal zero baseline
+                                        return '#374151'; // Darker zero baseline
                                     }
                                     return '#e5e7eb';
                                 },
