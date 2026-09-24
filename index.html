@@ -7,27 +7,32 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; color: #333; }
         .header { background: #4f46e5; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { margin: 0; font-size: 24px; }
+        .header h1 { margin: 0; font-size: 22px; }
         .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; }
         
-        .live-status { display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; gap: 10px; }
-        .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-        @keyframes continuousSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .continuous-spinner { display: inline-block; animation: continuousSpin 2s linear infinite; font-size: 20px; line-height: 1; }
+        .controls { display: flex; gap: 10px; align-items: center; }
+        select, button { padding: 8px 12px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
+        select { background: white; color: #333; }
+        button { background-color: #3b82f6; color: white; }
+        button:hover { background-color: #2563eb; }
 
         .container { padding: 20px; max-width: 1400px; margin: auto; }
+        
+        /* Top Summary Cards Grid */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .metric-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #4f46e5; }
+        .metric-title { font-size: 12px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 8px; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #111827; }
+        .metric-value.green { color: #10b981; }
+        .metric-value.red { color: #dc2626; }
+
         .chart-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
         .table-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
         th { background-color: #f9fafb; color: #374151; font-weight: 600; }
-        button { background-color: #6366f1; color: white; padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        button:hover { background-color: #4338ca; }
+        .search-box { float: right; padding: 8px; width: 250px; border: 1px solid #d1d5db; border-radius: 4px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -36,23 +41,44 @@
         <div>
             <h1>Denny Gen AI Engineering</h1>
             <div class="subtitle">Global Multi-Branch Enterprise Intelligence Hub</div>
-            <div class="live-status">
-                <span class="pulse-dot"></span>
-                <span class="continuous-spinner">⚙️</span>
-                <span id="statusText">Syncing POS & Demand Stream...</span>
-            </div>
         </div>
-        <div>
+        <div class="controls">
+            <select id="companySelect">
+                <option>Company: Denny Enterprise</option>
+            </select>
+            <select id="branchSelect">
+                <option>Branch: Jeli HQ</option>
+            </select>
             <button onclick="loadAllData()">🔄 Refresh Data</button>
         </div>
     </div>
 
     <div class="container">
         
+        <!-- Top Summary Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Total Monitored SKUs</div>
+                <div class="metric-value" id="totalSkus">0</div>
+            </div>
+            <div class="metric-card" style="border-left-color: #dc2626;">
+                <div class="metric-title">Items Requiring Purchase</div>
+                <div class="metric-value red" id="itemsToBuy">0</div>
+            </div>
+            <div class="metric-card" style="border-left-color: #3b82f6;">
+                <div class="metric-title">Active Lead Time</div>
+                <div class="metric-value">5 Days</div>
+            </div>
+            <div class="metric-card" style="border-left-color: #10b981;">
+                <div class="metric-title">System Status</div>
+                <div class="metric-value green" style="font-size: 18px; margin-top: 4px;">AI Model Active</div>
+            </div>
+        </div>
+
         <!-- 7-Day Demand Sensing Line Chart -->
         <div class="chart-section">
             <h3 style="margin-top:0; color:#374151;">ML Baseline vs. Effective Sensed Demand (7-Day Trend)</h3>
-            <div style="height: 280px;">
+            <div style="height: 260px;">
                 <canvas id="lineDemandChart"></canvas>
             </div>
         </div>
@@ -60,14 +86,15 @@
         <!-- Current Stock vs. Projected Demand Bar Chart -->
         <div class="chart-section">
             <h3 style="margin-top:0; color:#374151;">Demand Baseline vs. Current Stock Levels</h3>
-            <div style="height: 280px;">
+            <div style="height: 260px;">
                 <canvas id="barStockChart"></canvas>
             </div>
         </div>
 
         <!-- Actionable Table Section -->
         <div class="table-section">
-            <h3 style="margin-top:0; color:#374151;">Instant Action & Reorder Decisions</h3>
+            <h3 style="margin-top:0; color:#374151; display:inline-block;">Instant Action & Reorder Decisions</h3>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search SKU or Item Name..." onkeyup="filterTable()">
             <table>
                 <thead>
                     <tr>
@@ -88,6 +115,8 @@
     <script>
         let barChartInstance = null;
         let lineChartInstance = null;
+        let globalInventory = [];
+        let globalForecast = {};
 
         async function loadAllData() {
             try {
@@ -96,11 +125,19 @@
                     fetch('/api/demand-forecast')
                 ]);
 
-                const inventory = await invRes.json();
+                globalInventory = await invRes.json();
                 const forecastData = await forecastRes.json();
 
+                globalForecast = {};
+                if (forecastData && forecastData.forecasts) {
+                    forecastData.forecasts.forEach(f => {
+                        globalForecast[f.variant_id] = f.projected_demand;
+                    });
+                }
+
                 renderLineChart(forecastData);
-                renderBarChartAndTable(inventory, forecastData);
+                renderBarChartAndMetrics(globalInventory, globalForecast);
+                renderTable(globalInventory, globalForecast);
             } catch (err) {
                 console.error("Error loading unified dashboard data:", err);
             }
@@ -110,7 +147,7 @@
             const ctx = document.getElementById('lineDemandChart').getContext('2d');
             if (lineChartInstance) lineChartInstance.destroy();
 
-            const trendDates = data.trend_dates || ["2026-09-11", "2026-09-12", "2026-09-13", "2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17"];
+            const trendDates = data.trend_dates || ["2026-09-18", "2026-09-19", "2026-09-20", "2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24"];
             const mlBaseline = data.ml_baseline || [106.4, 127.5, 131.0, 135.8, 129.5, 105.0, 99.6];
             const effDemand = data.effective_demand || [175.5, 250.0, 131.0, 135.8, 129.5, 105.0, 99.6];
 
@@ -145,41 +182,30 @@
             });
         }
 
-        function renderBarChartAndTable(inventory, forecastData) {
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
-
+        function renderBarChartAndMetrics(inventory, forecastMap) {
             let labels = [];
             let stockValues = [];
             let demandValues = [];
             let stockColors = [];
 
-            let forecastMap = {};
-            if (forecastData && forecastData.forecasts) {
-                forecastData.forecasts.forEach(f => {
-                    forecastMap[f.variant_id] = f.projected_demand;
-                });
-            }
+            let totalSkus = inventory.length;
+            let itemsToBuyCount = 0;
 
-            inventory.forEach((item, index) => {
-                const projected = forecastMap[item.id] || 0; 
+            inventory.forEach((item) => {
+                const projected = forecastMap[item.id] !== undefined ? forecastMap[item.id] : 0;
                 const isLow = item.stock <= projected;
-                const decision = isLow ? `<span style="color:red; font-weight:bold;">🛒 BUY / RESTOCK (~${Math.abs(item.stock)})</span>` : `<span style="color:green; font-weight:bold;">✔ Sufficient</span>`;
+                if (isLow) itemsToBuyCount++;
+            });
 
-                tableBody.innerHTML += `<tr>
-                    <td>${item.name}</td>
-                    <td>${item.sku}</td>
-                    <td>${item.stock}</td>
-                    <td>${projected}</td>
-                    <td>${decision}</td>
-                </tr>`;
+            document.getElementById('totalSkus').innerText = totalSkus;
+            document.getElementById('itemsToBuy').innerText = itemsToBuyCount;
 
-                if (index < 10) {
-                    labels.push(item.name);
-                    stockValues.push(item.stock);
-                    demandValues.push(projected);
-                    stockColors.push(item.stock < 0 ? '#dc2626' : '#3b82f6');
-                }
+            inventory.slice(0, 10).forEach(item => {
+                const projected = forecastMap[item.id] !== undefined ? forecastMap[item.id] : 0;
+                labels.push(item.name);
+                stockValues.push(item.stock);
+                demandValues.push(projected);
+                stockColors.push(item.stock < 0 ? '#dc2626' : '#3b82f6');
             });
 
             const ctx = document.getElementById('barStockChart').getContext('2d');
@@ -200,6 +226,44 @@
                     plugins: { legend: { position: 'top' } }
                 }
             });
+        }
+
+        function renderTable(inventory, forecastMap) {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            inventory.forEach((item) => {
+                const projected = forecastMap[item.id] !== undefined ? forecastMap[item.id] : 0;
+                const isLow = item.stock <= projected;
+                const decision = isLow ? `<span style="color:red; font-weight:bold;">🛒 BUY / RESTOCK (~${Math.abs(item.stock)})</span>` : `<span style="color:green; font-weight:bold;">✔ Sufficient</span>`;
+
+                tableBody.innerHTML += `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.sku}</td>
+                    <td>${item.stock}</td>
+                    <td>${projected}</td>
+                    <td>${decision}</td>
+                </tr>`;
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.getElementById('table-body').getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const nameCell = rows[i].getElementsByTagName('td')[0];
+                const skuCell = rows[i].getElementsByTagName('td')[1];
+                if (nameCell && skuCell) {
+                    const nameText = nameCell.textContent.toLowerCase();
+                    const skuText = skuCell.textContent.toLowerCase();
+                    if (nameText.includes(input) || skuText.includes(input)) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
         }
 
         loadAllData();
