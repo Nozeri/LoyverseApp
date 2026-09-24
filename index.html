@@ -10,6 +10,20 @@
         .header { background: #4f46e5; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; font-size: 24px; }
         .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.3px; }
+        
+        /* Live System Status Badge */
+        .live-status { display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.15); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; gap: 6px; }
+        .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Spinning animation for syncing */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinning { display: inline-block; animation: spin 1s linear infinite; }
+
         .controls { display: flex; gap: 15px; align-items: center; }
         select, button { padding: 8px 12px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
         button { background-color: #6366f1; color: white; font-weight: bold; }
@@ -52,6 +66,10 @@
         <div>
             <h1>Denny Gen AI Engineering</h1>
             <div class="subtitle">Global Multi-Branch Enterprise Intelligence Hub</div>
+            <div class="live-status">
+                <span class="pulse-dot"></span>
+                <span id="statusText">AI Engine Active & Polling (10s)</span>
+            </div>
         </div>
         <div class="controls">
             <select id="companySelector" onchange="switchContext()">
@@ -62,7 +80,7 @@
                 <option value="branch_jeli">BRANCH SHOP: Jeli HQ</option>
                 <option value="branch_kl">BRANCH SHOP: KL Central</option>
             </select>
-            <button id="refreshBtn" onclick="loadDashboard(false)">🔄 Refresh Data</button>
+            <button id="refreshBtn" onclick="loadDashboard(false)"><span id="refreshIcon">🔄</span> Refresh Data</button>
         </div>
     </div>
 
@@ -148,9 +166,16 @@
 
         async function loadDashboard(silent = false) {
             const btn = document.getElementById('refreshBtn');
+            const icon = document.getElementById('refreshIcon');
+            const statusText = document.getElementById('statusText');
+
             if (btn && !silent) {
                 btn.disabled = true;
-                btn.innerText = '⏳ Refreshing...';
+                icon.className = 'spinning';
+            }
+            
+            if (silent) {
+                statusText.innerText = 'Syncing POS & Demand Stream...';
             }
 
             try {
@@ -179,8 +204,9 @@
             } finally {
                 if (btn && !silent) {
                     btn.disabled = false;
-                    btn.innerText = '🔄 Refresh Data';
+                    icon.className = '';
                 }
+                statusText.innerText = 'AI Engine Active & Polling (10s)';
             }
         }
 
@@ -255,7 +281,6 @@
                 demandChartInstance.destroy();
             }
 
-            // Current Stock colors: Red for restock deficits, Blue for sufficient stock
             const stockColors = inventorySlice.map(item => {
                 const projected = globalForecasts[item.id] || 0;
                 return item.stock <= projected ? '#dc2626' : '#3b82f6';
@@ -276,7 +301,7 @@
                         {
                             label: 'Projected Demand',
                             data: demandData,
-                            backgroundColor: '#10b981', // Solid Green for Demand
+                            backgroundColor: '#10b981',
                             borderColor: '#10b981',
                             borderWidth: 1
                         }
@@ -292,24 +317,17 @@
                         }
                     },
                     scales: {
-                        x: {
-                            stacked: false,
-                            grid: { display: false }
-                        },
+                        x: { stacked: false, grid: { display: false } },
                         y: { 
                             stacked: false,
                             beginAtZero: true,
                             grid: {
                                 color: function(context) {
-                                    if (context.tick.value === 0) {
-                                        return '#374151'; // Dark zero baseline
-                                    }
+                                    if (context.tick.value === 0) return '#374151';
                                     return '#e5e7eb';
                                 },
                                 lineWidth: function(context) {
-                                    if (context.tick.value === 0) {
-                                        return 2;
-                                    }
+                                    if (context.tick.value === 0) return 2;
                                     return 1;
                                 }
                             }
@@ -368,7 +386,7 @@
         // Initial load on page open
         loadDashboard(false);
 
-        // Automatically poll/refresh data in the background every 10 seconds silently
+        // Automatically poll data in the background every 10 seconds silently
         setInterval(() => {
             loadDashboard(true);
         }, 10000);
