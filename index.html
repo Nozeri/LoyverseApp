@@ -12,7 +12,7 @@
         .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.3px; }
         
         /* Live System Status Badge */
-        .live-status { display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.15); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; gap: 6px; }
+        .live-status { display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; gap: 8px; }
         .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); animation: pulse 2s infinite; }
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
@@ -20,9 +20,12 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* Spinning animation for syncing */
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .spinning { display: inline-block; animation: spin 1s linear infinite; }
+        /* Continuous Spinning Animation */
+        @keyframes continuousSpin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        .continuous-spinner { display: inline-block; animation: continuousSpin 2s linear infinite; font-size: 14px; }
 
         .controls { display: flex; gap: 15px; align-items: center; }
         select, button { padding: 8px 12px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
@@ -68,6 +71,7 @@
             <div class="subtitle">Global Multi-Branch Enterprise Intelligence Hub</div>
             <div class="live-status">
                 <span class="pulse-dot"></span>
+                <span class="continuous-spinner">⚙️</span>
                 <span id="statusText">AI Engine Active & Polling (10s)</span>
             </div>
         </div>
@@ -171,7 +175,7 @@
 
             if (btn && !silent) {
                 btn.disabled = true;
-                icon.className = 'spinning';
+                icon.className = 'continuous-spinner';
             }
             
             if (silent) {
@@ -359,7 +363,7 @@
             let branchDisplayName = hostingEnv.replace(/^https?:\/\//, '').split('/')[0];
 
             try {
-                const response = await fetch('/api/save-config', {
+                const response = att_fetch = await fetch('/api/save-config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ api_token: apiToken, hosting_env: hostingEnv })
