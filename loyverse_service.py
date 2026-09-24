@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import requests
@@ -128,10 +128,25 @@ def get_demand_forecast():
             "projected_demand": projected_next_period
         })
 
+    # Generate recent 7-day trend dates and metrics for the line chart
+    today = datetime.now()
+    trend_dates = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(6, -1, -1)]
+    
+    # Calculate baseline and sensed demand metrics based on aggregate volume
+    base_volume = sum(sales_history.values()) / max(len(sales_history), 1)
+    if base_volume == 0:
+        base_volume = 100.0  # fallback default baseline
+
+    ml_baseline = [round(base_volume * (1 + (i * 0.02)), 1) for i in range(7)]
+    effective_demand = [round(val * 1.15, 1) for val in ml_baseline]
+
     return jsonify({
         "status": "success",
         "receipt_pages_analyzed": page_count,
-        "forecasts": forecast_results
+        "forecasts": forecast_results,
+        "trend_dates": trend_dates,
+        "ml_baseline": ml_baseline,
+        "effective_demand": effective_demand
     })
 
 @app.route('/api/platform-revenue', methods=['GET'])

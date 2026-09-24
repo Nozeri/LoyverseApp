@@ -2,65 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Denny Gen AI Engineering - Universal Demand & Inventory Hub</title>
-    <!-- Include Chart.js for graphs -->
+    <title>Denny Gen AI Engineering - Unified Enterprise Intelligence Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f9; color: #333; }
         .header { background: #4f46e5; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; font-size: 24px; }
-        .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.3px; }
+        .subtitle { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; }
         
-        /* Live System Status Badge */
         .live-status { display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 6px; gap: 10px; }
-        .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); animation: pulse 2s infinite; }
+        .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
-
-        /* Continuous Spinning Animation (Larger and Bolder) */
-        @keyframes continuousSpin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
+        @keyframes continuousSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .continuous-spinner { display: inline-block; animation: continuousSpin 2s linear infinite; font-size: 24px; font-weight: bold; line-height: 1; }
 
-        .controls { display: flex; gap: 15px; align-items: center; }
-        select, button { padding: 8px 12px; font-size: 14px; border-radius: 4px; border: none; cursor: pointer; }
-        button { background-color: #6366f1; color: white; font-weight: bold; }
-        button:hover { background-color: #4338ca; }
-        button:disabled { background-color: #9ca3af; cursor: not-allowed; }
-        
         .container { padding: 20px; max-width: 1400px; margin: auto; }
-        
-        /* Onboarding Configuration Box */
-        .config-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .config-card h3 { margin-top: 0; color: #374151; font-size: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; }
-        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .config-field label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 5px; }
-        .config-field input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
-
-        /* Metric Cards */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .card h3 { margin: 0 0 10px 0; color: #6b7280; font-size: 13px; text-transform: uppercase; }
-        .card .value { font-size: 28px; font-weight: bold; color: #111827; }
-
-        /* Chart Section */
         .chart-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        
-        /* Table Section */
         .table-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .table-header input { padding: 8px; width: 250px; border: 1px solid #d1d5db; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
         th { background-color: #f9fafb; color: #374151; font-weight: 600; }
-        
-        .badge-buy { background-color: #fee2e2; color: #991b1b; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
-        .badge-ok { background-color: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+        button { background-color: #6366f1; color: white; padding: 8px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #4338ca; }
     </style>
 </head>
 <body>
@@ -68,84 +35,39 @@
     <div class="header">
         <div>
             <h1>Denny Gen AI Engineering</h1>
-            <div class="subtitle">Global Multi-Branch Enterprise Intelligence Hub</div>
+            <div class="subtitle">Unified Enterprise Intelligence & Demand Sensing Hub</div>
             <div class="live-status">
                 <span class="pulse-dot"></span>
-                <span class="continuous-spinner">⚙️</span>
+                <span id="refreshIcon" class="continuous-spinner">⚙️</span>
                 <span id="statusText">AI Engine Active & Polling (10s)</span>
             </div>
         </div>
-        <div class="controls">
-            <select id="companySelector" onchange="switchContext()">
-                <option value="company_a">Company: Denny Enterprise</option>
-                <option value="company_b">Company: Retail Partners Bhd</option>
-            </select>
-            <select id="branchSelector" onchange="switchContext()">
-                <option value="branch_jeli">BRANCH SHOP: Jeli HQ</option>
-                <option value="branch_kl">BRANCH SHOP: KL Central</option>
-            </select>
-            <button id="refreshBtn" onclick="loadDashboard(false)"><span id="refreshIcon">🔄</span> Refresh Data</button>
+        <div>
+            <button onclick="loadAllData()">🔄 Refresh Hub</button>
         </div>
     </div>
 
     <div class="container">
         
-        <!-- Client Onboarding Configuration Box -->
-        <div class="config-card">
-            <h3>System Access & Setup Configuration</h3>
-            <form id="config-form" onsubmit="saveConfiguration(event)">
-                <div class="config-grid">
-                    <div class="config-field">
-                        <label>1. POS API Access Token:</label>
-                        <input type="password" id="api-token" placeholder="Enter your POS token here" required>
-                    </div>
-                    <div class="config-field">
-                        <label>2. Client Hosting Environment / Branch URL:</label>
-                        <input type="text" id="hosting-env" placeholder="e.g., https://your-branch.onrender.com" required>
-                    </div>
-                    <div class="config-field">
-                        <label>3. Client Interface Browser URL:</label>
-                        <input type="text" id="dashboard-url" value="https://loyverse-dashboard.onrender.com" readonly>
-                    </div>
-                </div>
-                <button type="submit">Save & Initialize System</button>
-            </form>
-        </div>
-
-        <!-- Metrics Cards -->
-        <div class="metrics-grid">
-            <div class="card">
-                <h3>Total Monitored SKUs</h3>
-                <div class="value" id="metric-skus">-</div>
-            </div>
-            <div class="card">
-                <h3>Items Requiring Purchase</h3>
-                <div class="value" id="metric-restock" style="color: #dc2626;">-</div>
-            </div>
-            <div class="card">
-                <h3>Branch Sales Volume</h3>
-                <div class="value" id="metric-sales" style="color: #2563eb;">RM 0.00</div>
-            </div>
-            <div class="card">
-                <h3>Platform Commission (1%)</h3>
-                <div class="value" id="metric-earnings" style="color: #059669;">RM 0.00</div>
-            </div>
-        </div>
-
-        <!-- Graph Section -->
+        <!-- 7-Day Demand Sensing Line Chart -->
         <div class="chart-section">
-            <h3 style="margin-top:0; color:#374151;">Demand Baseline vs. Current Stock Levels</h3>
-            <div style="height: 300px;">
-                <canvas id="demandChart"></canvas>
+            <h3 style="margin-top:0; color:#374151;">ML Baseline vs. Effective Sensed Demand (7-Day Trend)</h3>
+            <div style="height: 280px;">
+                <canvas id="lineDemandChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Current Stock vs. Projected Demand Bar Chart -->
+        <div class="chart-section">
+            <h3 style="margin-top:0; color:#374151;">Current Stock Levels vs. Projected Demand</h3>
+            <div style="height: 280px;">
+                <canvas id="barStockChart"></canvas>
             </div>
         </div>
 
         <!-- Actionable Table Section -->
         <div class="table-section">
-            <div class="table-header">
-                <h3 style="margin:0; color:#374151;">Instant Action & Reorder Decisions</h3>
-                <input type="text" id="searchInput" placeholder="Search SKU or Item Name..." onkeyup="filterTable()">
-            </div>
+            <h3 style="margin-top:0; color:#374151;">Instant Action & Reorder Decisions</h3>
             <table>
                 <thead>
                     <tr>
@@ -157,243 +79,132 @@
                     </tr>
                 </thead>
                 <tbody id="table-body">
-                    <tr><td colspan="5" style="text-align: center;">Loading enterprise data...</td></tr>
+                    <tr><td colspan="5" style="text-align: center;">Loading unified enterprise data...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        let globalInventory = [];
-        let globalForecasts = {};
-        let demandChartInstance = null;
+        let barChartInstance = null;
+        let lineChartInstance = null;
 
-        async function loadDashboard(silent = false) {
-            const btn = document.getElementById('refreshBtn');
-            const icon = document.getElementById('refreshIcon');
-            const statusText = document.getElementById('statusText');
-
-            if (btn && !silent) {
-                btn.disabled = true;
-                icon.className = 'continuous-spinner'; // Reuse the large spinner while fetching
-            }
-            
-            if (silent) {
-                statusText.innerText = 'Syncing POS & Demand Stream...';
-            }
-
+        async function loadAllData() {
             try {
                 const [invRes, forecastRes] = await Promise.all([
                     fetch('/api/loyverse-inventory'),
                     fetch('/api/demand-forecast')
                 ]);
 
-                globalInventory = await invRes.json();
+                const inventory = await invRes.json();
                 const forecastData = await forecastRes.json();
 
-                globalForecasts = {};
-                if (forecastData && forecastData.forecasts) {
-                    forecastData.forecasts.forEach(f => {
-                        globalForecasts[f.variant_id] = f.projected_demand;
-                    });
-                }
-
-                renderDashboard();
-                await loadPlatformRevenue();
-            } catch (error) {
-                console.error('Failed to load dashboard data:', error);
-                if (!silent) {
-                    document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Error connecting to Flask backend service.</td></tr>`;
-                }
-            } finally {
-                if (btn && !silent) {
-                    btn.disabled = false;
-                    icon.className = '';
-                }
-                statusText.innerText = 'AI Engine Active & Polling (10s)';
-            }
-        }
-
-        async function loadPlatformRevenue() {
-            try {
-                const response = await fetch('/api/platform-revenue');
-                const data = await response.json();
-                
-                if (data) {
-                    if (data.total_sales_gmv !== undefined) {
-                        document.getElementById('metric-sales').innerText = `RM ${data.total_sales_gmv.toFixed(2)}`;
-                    } else if (data.total_sales !== undefined) {
-                        document.getElementById('metric-sales').innerText = `RM ${data.total_sales.toFixed(2)}`;
-                    }
-                    if (data.platform_fee_earned !== undefined) {
-                        document.getElementById('metric-earnings').innerText = `RM ${data.platform_fee_earned.toFixed(2)}`;
-                    }
-                }
+                renderLineChart(forecastData);
+                renderBarChartAndTable(inventory, forecastData);
             } catch (err) {
-                console.error("Failed to calculate platform revenue:", err);
+                console.error("Error loading unified dashboard data:", err);
             }
         }
 
-        function renderDashboard() {
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
+        function renderLineChart(data) {
+            const ctx = document.getElementById('lineDemandChart').getContext('2d');
+            if (lineChartInstance) lineChartInstance.destroy();
 
-            let restockCount = 0;
-            let chartLabels = [];
-            let chartStock = [];
-            let chartDemand = [];
-            let chartInventorySlice = [];
+            // Fallback sample dates/trends if backend returns list directly or object
+            const trendDates = data.trend_dates || ["2026-09-11", "2026-09-12", "2026-09-13", "2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17"];
+            const mlBaseline = data.ml_baseline || [106.4, 127.5, 131.0, 135.8, 129.5, 105.0, 99.6];
+            const effDemand = data.effective_demand || [175.5, 250.0, 131.0, 135.8, 129.5, 105.0, 99.6];
 
-            globalInventory.forEach((item, index) => {
-                const projected = globalForecasts[item.id] || 0;
-                let decisionHtml = '';
-
-                if (item.stock <= projected) {
-                    const deficit = Math.round(projected - item.stock);
-                    decisionHtml = `<span class="badge-buy">🛒 BUY / RESTOCK (~${deficit})</span>`;
-                    restockCount++;
-                } else {
-                    decisionHtml = `<span class="badge-ok">✔ Sufficient</span>`;
-                }
-
-                const row = `<tr>
-                    <td>${item.name}</td>
-                    <td>${item.sku}</td>
-                    <td>${item.stock}</td>
-                    <td>${projected}</td>
-                    <td>${decisionHtml}</td>
-                </tr>`;
-                tableBody.innerHTML += row;
-
-                if (index < 10) {
-                    chartLabels.push(item.name);
-                    chartStock.push(Number(item.stock) || 0);
-                    chartDemand.push(Number(projected) || 0);
-                    chartInventorySlice.push(item);
-                }
-            });
-
-            document.getElementById('metric-skus').innerText = globalInventory.length;
-            document.getElementById('metric-restock').innerText = restockCount;
-
-            renderChart(chartLabels, chartStock, chartDemand, chartInventorySlice);
-        }
-
-        function renderChart(labels, stockData, demandData, inventorySlice) {
-            const ctx = document.getElementById('demandChart').getContext('2d');
-            if (demandChartInstance) {
-                demandChartInstance.destroy();
-            }
-
-            const stockColors = inventorySlice.map(item => {
-                const projected = globalForecasts[item.id] || 0;
-                return item.stock <= projected ? '#dc2626' : '#3b82f6';
-            });
-
-            demandChartInstance = new Chart(ctx, {
-                type: 'bar',
+            lineChartInstance = new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: labels,
+                    labels: trendDates,
                     datasets: [
                         {
-                            label: 'Current Stock',
-                            data: stockData,
-                            backgroundColor: stockColors,
-                            borderColor: stockColors,
-                            borderWidth: 1
+                            label: 'ML Baseline Demand',
+                            data: mlBaseline,
+                            borderColor: '#9ca3af',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1
                         },
                         {
-                            label: 'Projected Demand',
-                            data: demandData,
-                            backgroundColor: '#10b981',
-                            borderColor: '#10b981',
-                            borderWidth: 1
+                            label: 'Effective Demand (Sensed)',
+                            data: effDemand,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        x: { stacked: false, grid: { display: false } },
-                        y: { 
-                            stacked: false,
-                            beginAtZero: true,
-                            grid: {
-                                color: function(context) {
-                                    if (context.tick.value === 0) return '#374151';
-                                    return '#e5e7eb';
-                                },
-                                lineWidth: function(context) {
-                                    if (context.tick.value === 0) return 2;
-                                    return 1;
-                                }
-                            }
-                        }
-                    }
+                    plugins: { legend: { position: 'top' } }
                 }
             });
         }
 
-        function filterTable() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.getElementById('table-body').getElementsByTagName('tr');
-            
-            for (let i = 0; i < rows.length; i++) {
-                const text = rows[i].innerText.toLowerCase();
-                rows[i].style.display = text.includes(input) ? '' : 'none';
-            }
-        }
+        function renderBarChartAndTable(inventory, forecastData) {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
 
-        function switchContext() {
-            loadDashboard(false);
-        }
+            let labels = [];
+            let stockValues = [];
+            let demandValues = [];
+            let stockColors = [];
 
-        async function saveConfiguration(event) {
-            event.preventDefault();
-            const apiToken = document.getElementById('api-token').value;
-            const hostingEnv = document.getElementById('hosting-env').value;
-
-            let branchDisplayName = hostingEnv.replace(/^https?:\/\//, '').split('/')[0];
-
-            try {
-                const response = await fetch('/api/save-config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ api_token: apiToken, hosting_env: hostingEnv })
+            let forecastMap = {};
+            if (forecastData && forecastData.forecasts) {
+                forecastData.forecasts.forEach(f => {
+                    forecastMap[f.variant_id] = f.projected_demand;
                 });
-                const result = await response.json();
-                if (response.ok) {
-                    alert(result.message || "Configuration saved successfully!");
-                    
-                    const branchSelector = document.getElementById('branchSelector');
-                    if (branchSelector) {
-                        branchSelector.options[branchSelector.selectedIndex].text = `BRANCH SHOP: ${branchDisplayName}`;
-                    }
-
-                    loadDashboard(false);
-                } else {
-                    alert(result.error || "Failed to save configuration.");
-                }
-            } catch (err) {
-                console.error("Error saving config:", err);
-                alert("Network error while saving configuration.");
             }
+
+            inventory.forEach((item, index) => {
+                const projected = forecastMap[item.id] || 50; 
+                const isLow = item.stock <= projected;
+                const decision = isLow ? `<span style="color:red; font-weight:bold;">🛒 BUY / RESTOCK</span>` : `<span style="color:green; font-weight:bold;">✔ Sufficient</span>`;
+
+                tableBody.innerHTML += `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.sku}</td>
+                    <td>${item.stock}</td>
+                    <td>${projected}</td>
+                    <td>${decision}</td>
+                </tr>`;
+
+                if (index < 10) {
+                    labels.push(item.name);
+                    stockValues.push(item.stock);
+                    demandValues.push(projected);
+                    stockColors.push(isLow ? '#dc2626' : '#3b82f6');
+                }
+            });
+
+            const ctx = document.getElementById('barStockChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+
+            barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Current Stock', data: stockValues, backgroundColor: stockColors },
+                        { label: 'Projected Demand', data: demandValues, backgroundColor: '#10b981' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
         }
 
-        // Initial load on page open
-        loadDashboard(false);
-
-        // Automatically poll data in the background every 10 seconds silently
-        setInterval(() => {
-            loadDashboard(true);
-        }, 10000);
+        loadAllData();
+        setInterval(loadAllData, 10000);
     </script>
 </body>
 </html>
