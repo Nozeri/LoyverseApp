@@ -18,7 +18,7 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
         @keyframes continuousSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .continuous-spinner { display: inline-block; animation: continuousSpin 2s linear infinite; font-size: 24px; font-weight: bold; line-height: 1; }
+        .continuous-spinner { display: inline-block; animation: continuousSpin 2s linear infinite; font-size: 20px; line-height: 1; }
 
         .container { padding: 20px; max-width: 1400px; margin: auto; }
         .chart-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
@@ -35,15 +35,15 @@
     <div class="header">
         <div>
             <h1>Denny Gen AI Engineering</h1>
-            <div class="subtitle">Unified Enterprise Intelligence & Demand Sensing Hub</div>
+            <div class="subtitle">Global Multi-Branch Enterprise Intelligence Hub</div>
             <div class="live-status">
                 <span class="pulse-dot"></span>
-                <span id="refreshIcon" class="continuous-spinner">⚙️</span>
-                <span id="statusText">AI Engine Active & Polling (10s)</span>
+                <span class="continuous-spinner">⚙️</span>
+                <span id="statusText">Syncing POS & Demand Stream...</span>
             </div>
         </div>
         <div>
-            <button onclick="loadAllData()">🔄 Refresh Hub</button>
+            <button onclick="loadAllData()">🔄 Refresh Data</button>
         </div>
     </div>
 
@@ -59,7 +59,7 @@
 
         <!-- Current Stock vs. Projected Demand Bar Chart -->
         <div class="chart-section">
-            <h3 style="margin-top:0; color:#374151;">Current Stock Levels vs. Projected Demand</h3>
+            <h3 style="margin-top:0; color:#374151;">Demand Baseline vs. Current Stock Levels</h3>
             <div style="height: 280px;">
                 <canvas id="barStockChart"></canvas>
             </div>
@@ -110,7 +110,6 @@
             const ctx = document.getElementById('lineDemandChart').getContext('2d');
             if (lineChartInstance) lineChartInstance.destroy();
 
-            // Fallback sample dates/trends if backend returns list directly or object
             const trendDates = data.trend_dates || ["2026-09-11", "2026-09-12", "2026-09-13", "2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17"];
             const mlBaseline = data.ml_baseline || [106.4, 127.5, 131.0, 135.8, 129.5, 105.0, 99.6];
             const effDemand = data.effective_demand || [175.5, 250.0, 131.0, 135.8, 129.5, 105.0, 99.6];
@@ -163,9 +162,9 @@
             }
 
             inventory.forEach((item, index) => {
-                const projected = forecastMap[item.id] || 50; 
+                const projected = forecastMap[item.id] || 0; 
                 const isLow = item.stock <= projected;
-                const decision = isLow ? `<span style="color:red; font-weight:bold;">🛒 BUY / RESTOCK</span>` : `<span style="color:green; font-weight:bold;">✔ Sufficient</span>`;
+                const decision = isLow ? `<span style="color:red; font-weight:bold;">🛒 BUY / RESTOCK (~${Math.abs(item.stock)})</span>` : `<span style="color:green; font-weight:bold;">✔ Sufficient</span>`;
 
                 tableBody.innerHTML += `<tr>
                     <td>${item.name}</td>
@@ -179,7 +178,7 @@
                     labels.push(item.name);
                     stockValues.push(item.stock);
                     demandValues.push(projected);
-                    stockColors.push(isLow ? '#dc2626' : '#3b82f6');
+                    stockColors.push(item.stock < 0 ? '#dc2626' : '#3b82f6');
                 }
             });
 
