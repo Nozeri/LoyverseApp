@@ -156,12 +156,22 @@
                 renderBarChartAndMetrics(globalInventory, globalForecast);
                 renderTable(globalInventory, globalForecast);
 
-                // Update last sync timestamp with date and time
+                // Update last sync timestamp with DD/MM/YY format and time
                 const now = new Date();
-                document.getElementById('syncTimestamp').innerText = "Last Sync: " + now.toLocaleString();
+                const day = String(now.getDate());
+                const month = String(now.getMonth() + 1);
+                const year = String(now.getFullYear()).slice(-2);
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                document.getElementById('syncTimestamp').innerText = `Last Sync: ${day}/${month}/${year}, ${timeStr}`;
             } catch (err) {
                 console.error("Error loading unified dashboard data:", err);
-                document.getElementById('syncTimestamp').innerText = "Sync Failed: " + new Date().toLocaleString();
+                const now = new Date();
+                const day = String(now.getDate());
+                const month = String(now.getMonth() + 1);
+                const year = String(now.getFullYear()).slice(-2);
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('syncTimestamp').innerText = `Sync Failed: ${day}/${month}/${year}, ${timeStr}`;
             }
         }
 
@@ -169,7 +179,16 @@
             const ctx = document.getElementById('lineDemandChart').getContext('2d');
             if (lineChartInstance) lineChartInstance.destroy();
 
-            const trendDates = data.trend_dates || ["2026-09-18", "2026-09-19", "2026-09-20", "2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24"];
+            // Convert default ISO dates (YYYY-MM-DD) to DD/M/YY format
+            const rawDates = data.trend_dates || ["2026-09-18", "2026-09-19", "2026-09-20", "2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24"];
+            const trendDates = rawDates.map(dateStr => {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    return `${parseInt(parts[2], 10)}/${parseInt(parts[1], 10)}/${parts[0].slice(-2)}`;
+                }
+                return dateStr;
+            });
+
             const mlBaseline = data.ml_baseline || [106.4, 127.5, 131.0, 135.8, 129.5, 105.0, 99.6];
             const effDemand = data.effective_demand || [175.5, 250.0, 131.0, 135.8, 129.5, 105.0, 99.6];
 
