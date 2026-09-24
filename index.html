@@ -88,6 +88,7 @@
             <div class="metric-card" style="border-left-color: #10b981;">
                 <div class="metric-title">System Status</div>
                 <div class="metric-value green" style="font-size: 18px; margin-top: 4px;">AI Model Active</div>
+                <div id="syncTimestamp" style="font-size: 11px; color: #6b7280; margin-top: 4px; font-weight: normal;">Last Sync: Never</div>
             </div>
         </div>
 
@@ -154,8 +155,13 @@
                 renderLineChart(forecastData);
                 renderBarChartAndMetrics(globalInventory, globalForecast);
                 renderTable(globalInventory, globalForecast);
+
+                // Update last sync timestamp
+                const now = new Date();
+                document.getElementById('syncTimestamp').innerText = "Last Sync: " + now.toLocaleTimeString();
             } catch (err) {
                 console.error("Error loading unified dashboard data:", err);
+                document.getElementById('syncTimestamp').innerText = "Sync Failed: " + new Date().toLocaleTimeString();
             }
         }
 
